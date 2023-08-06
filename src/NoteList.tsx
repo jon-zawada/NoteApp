@@ -51,7 +51,6 @@ export function NoteList({
         note.title.toLocaleLowerCase().includes(title.toLocaleLowerCase()) &&
         (selectedTags.length === 0 ||
           selectedTags.every((tag) => {
-            console.log(tag, note);
             return note.tags.some((noteTag) => noteTag.id === tag.id);
           }))
       );
