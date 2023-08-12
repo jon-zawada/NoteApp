@@ -72,7 +72,7 @@ function App() {
     return notes.map((note) => {
       return {
         ...note,
-        tags: tags.filter((tag) => note.tagIds.includes(tag.id)), //fix this
+        tags: tags.filter((tag) => note.tagIds.includes(tag.id)),
       };
     });
   }, [notes, tags]);
@@ -83,21 +83,15 @@ function App() {
   }
 
   function onUpdateNote(id: string, { tags, ...data }: NoteData) {
-    setNotes((prevNotes) => {
-      return prevNotes.map((note) => {
-        if (note.id === id) {
-          return { ...note, ...data, tagIds: tags.map((tag: any) => tag.id) };
-        } else {
-          return note;
-        }
-      });
-    });
+    const tagIds = tags.map((tag: any) => tag.id);
+    const payload = {...data, tagIds, id}
+    axios.put("http://localhost:3000/notes", payload)
+    .then(() => initApp())
   }
 
   function onDeleteNote(id: string) {
-    setNotes((prevNotes) => {
-      return prevNotes.filter((note) => note.id !== id);
-    });
+    axios.delete(`http://localhost:3000/notes/${id}`)
+    .then(() => initApp())
   }
 
   function addTag(tag: NewTag) {
