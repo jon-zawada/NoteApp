@@ -41,7 +41,7 @@ export function NoteForm({
           <Col>
             <Form.Group controlId="title">
               <Form.Label>Title</Form.Label>
-              <Form.Control ref={titleRef} required defaultValue={title}/>
+              <Form.Control ref={titleRef} required defaultValue={title} />
             </Form.Group>
           </Col>
           <Col>
@@ -73,7 +73,13 @@ export function NoteForm({
         </Row>
         <Form.Group controlId="markdown">
           <Form.Label>Body</Form.Label>
-          <Form.Control defaultValue={markdown} required as="textarea" ref={markDownRef} rows={15} />
+          <Form.Control
+            defaultValue={markdown}
+            required
+            as="textarea"
+            ref={markDownRef}
+            rows={15}
+          />
         </Form.Group>
         <Stack direction="horizontal" gap={2} className="justify-content-end">
           <Button type="submit" variant="primary">

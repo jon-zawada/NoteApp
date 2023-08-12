@@ -1,9 +1,9 @@
-import { NoteData, Tag } from "./App";
+import { NoteData, Tag, NewTag } from "./App";
 import { NoteForm } from "./NoteForm";
 
 type NewNoteProps = {
   onSubmit: (data: NoteData) => void;
-  onAddTag: (tag: Tag) => void;
+  onAddTag: (tag: NewTag) => void;
   availableTags: Tag[];
 };
 
