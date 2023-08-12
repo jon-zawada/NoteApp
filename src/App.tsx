@@ -1,4 +1,5 @@
 import React from "react";
+import axios from 'axios';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Container } from "react-bootstrap";
 import { Routes, Route, Navigate } from "react-router-dom";
@@ -9,6 +10,7 @@ import { v4 as uuidV4 } from "uuid";
 import { NoteLayout } from "./NoteLayout";
 import { Note } from "./Note";
 import { EditNote } from "./EditNote";
+import "./styles.css";
 
 export type Note = {
   id: string;
@@ -35,26 +37,49 @@ export type Tag = {
   label: string;
 };
 
+export type NewTag = {
+  label: string;
+};
+
 function App() {
-  const [notes, setNotes] = useLocalStorage<RawNote[]>("NOTES", []);
-  const [tags, setTags] = useLocalStorage<Tag[]>("TAGS", []);
+  const [notes, setNotes] = React.useState<RawNote[]>([]);
+  const [tags, setTags] = React.useState<Tag[]>([]);
+
+  const getNotes = () => {
+    axios.get('http://localhost:3000/notes')
+      .then((res) => {
+        setNotes(res.data);
+      })
+  }
+
+  const getTags = () => {
+    axios.get('http://localhost:3000/tags')
+      .then((res) => {
+        setTags(res.data);
+      })
+  }
+
+  const initApp = () => {
+    getNotes();
+    getTags();
+  }
+
+  React.useEffect(() => {
+    initApp();
+  }, []);
 
   const notesWithTags = React.useMemo(() => {
     return notes.map((note) => {
       return {
         ...note,
-        tags: tags.filter((tag) => note.tagIds.includes(tag.id)),
+        tags: tags.filter((tag) => note.tagIds.includes(tag.id)), //fix this
       };
     });
   }, [notes, tags]);
 
   function onCreateNote({ tags, ...data }: NoteData) {
-    setNotes((prevNotes) => {
-      return [
-        ...prevNotes,
-        { ...data, id: uuidV4(), tagIds: tags.map((tag: any) => tag.id) },
-      ];
-    });
+    axios.post('http://localhost:3000/notes', {tags, ...data})
+    .then(() => initApp());
   }
 
   function onUpdateNote(id: string, { tags, ...data }: NoteData) {
@@ -75,26 +100,20 @@ function App() {
     });
   }
 
-  function addTag(tag: Tag) {
-    setTags((prev) => [...prev, tag]);
+  function addTag(tag: NewTag) {
+    axios.post('http://localhost:3000/tags', tag)
+      .then(()=> initApp());
   }
 
   function updateTag(id: string, label: string) {
-    setTags((prevTags) => {
-      return prevTags.map((tag) => {
-        if (tag.id === id) {
-          return { ...tag, label };
-        } else {
-          return tag;
-        }
-      });
-    });
+    //rework this to be on submit too many calls are made
+    axios.put('http://localhost:3000/tags', {id, label})
+    .then(() => initApp());
   }
 
   function deleteTag(id: string) {
-    setTags((prevTags) => {
-      return prevTags.filter((tag) => tag.id !== id);
-    });
+    axios.delete(`http://localhost:3000/tags/${id}`)
+    .then(() => initApp());
   }
 
   return (
